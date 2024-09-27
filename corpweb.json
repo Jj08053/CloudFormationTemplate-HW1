@@ -2,7 +2,7 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Parameters": {
     "InstanceType": {
-      "Description": "Server instance type",
+      "Description": "Server instance type: t2.micro or t2.small",
       "Type": "String",
       "Default": "t2.micro",
       "AllowedValues": [
@@ -47,7 +47,7 @@
                 {
                   "Effect": "Allow",
                   "Action": [
-                    "s3:*"
+                    "s3:GetObject"
                   ],
                   "Resource": "arn:aws:s3:::seis665-public/*"
                 }
@@ -241,7 +241,17 @@
         ],
         "UserData": {
           "Fn::Base64": {
-            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nservice httpd start\nchkconfig httpd on\naws s3 cp s3://seis665-public/index.php /var/www/html/"
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n",
+                "yum update -y\n",
+                "yum install -y git httpd php\n",
+                "service httpd start\n",
+                "chkconfig httpd on\n",
+                "aws s3 cp s3://seis665-public/index.php /var/www/html/"
+              ]
+            ]
           }
         }
       }
@@ -275,7 +285,17 @@
         ],
         "UserData": {
           "Fn::Base64": {
-            "Fn::Sub": "#!/bin/bash\nyum update -y\nyum install -y git httpd php\nservice httpd start\nchkconfig httpd on\naws s3 cp s3://seis665-public/index.php /var/www/html/"
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\n",
+                "yum update -y\n",
+                "yum install -y git httpd php\n",
+                "service httpd start\n",
+                "chkconfig httpd on\n",
+                "aws s3 cp s3://seis665-public/index.php /var/www/html/"
+              ]
+            ]
           }
         }
       }
@@ -357,18 +377,7 @@
     "WebUrl": {
       "Description": "ALB DNS Endpoint",
       "Value": {
-        "Fn::Join": [
-          "",
-          [
-            "http://",
-            {
-              "Fn::GetAtt": [
-                "EngineeringLB",
-                "DNSName"
-              ]
-            }
-          ]
-        ]
+        "Fn::Sub": "http://${EngineeringLB.DNSName}"
       }
     }
   }
